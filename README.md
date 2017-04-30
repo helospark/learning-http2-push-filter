@@ -70,7 +70,7 @@ In your browser call a link on your webserver
 
 How push is shown differ by browser. For example in Chrome `Push /` is shown in initiator field in Network tab, like:
 
-![Chrome image](https://raw.githubusercontent.com/helospark/learning-http2-push-filter/master/documentation/chrome_push.jpg) 
+![Chrome image](https://raw.githubusercontent.com/helospark/learning-http2-push-filter/master/documentation/chrome_push.png)
 
 When you are testing locally you probably will not see large speed improvements, afterall lo interface has very minimal latency
  you should check with actual network to see improvements.
