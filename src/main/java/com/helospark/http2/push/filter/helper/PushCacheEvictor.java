@@ -13,7 +13,11 @@ import com.helospark.http2.push.filter.helper.domain.PrimaryResourceData;
 public class PushCacheEvictor {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushCacheEvictor.class);
     private static final Float SECONDARY_RESOURCE_EVICT_CHANGE = 5.0f / 100.0f;
-    private final Random random = new Random();
+    private final Random random;
+
+    public PushCacheEvictor(Random random) {
+        this.random = random;
+    }
 
     public void randomlyEvictSecondaryResourceFromPushCache(Map<String, PrimaryResourceData> pushCache, String requestUri) {
         if (random.nextFloat() <= SECONDARY_RESOURCE_EVICT_CHANGE) {

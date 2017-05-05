@@ -6,7 +6,11 @@ import java.util.function.Predicate;
 import javax.servlet.http.HttpServletRequest;
 
 public class FilteringEnabledPredicate implements Predicate<HttpServletRequest> {
-    private final HttpServletHeaderExtractor httpServletHeaderExtractor = new HttpServletHeaderExtractor();
+    private final HttpServletHeaderExtractor httpServletHeaderExtractor;
+
+    public FilteringEnabledPredicate(HttpServletHeaderExtractor httpServletHeaderExtractor) {
+        this.httpServletHeaderExtractor = httpServletHeaderExtractor;
+    }
 
     @Override
     public boolean test(HttpServletRequest httpServletRequest) {

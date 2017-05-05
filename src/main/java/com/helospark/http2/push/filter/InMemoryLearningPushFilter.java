@@ -2,6 +2,7 @@ package com.helospark.http2.push.filter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Random;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,18 +18,42 @@ import org.slf4j.LoggerFactory;
 
 import com.helospark.http2.push.filter.helper.ConfigurationVerifier;
 import com.helospark.http2.push.filter.helper.FilteringEnabledPredicate;
+import com.helospark.http2.push.filter.helper.HttpServletHeaderExtractor;
+import com.helospark.http2.push.filter.helper.PushCacheEvictor;
+import com.helospark.http2.push.filter.helper.PushCacheSecondaryResourceAppender;
+import com.helospark.http2.push.filter.helper.RelativeRefererPathExtractor;
+import com.helospark.http2.push.filter.helper.ResourcePushService;
+import com.helospark.http2.push.filter.helper.SecondaryResourceAssosiatedWithPrimaryResourcePredicate;
 import com.helospark.http2.push.filter.helper.StatefulPushPerformer;
 
 public class InMemoryLearningPushFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryLearningPushFilter.class);
-    private final FilteringEnabledPredicate filteringEnabledPredicate = new FilteringEnabledPredicate();
-    private final StatefulPushPerformer statefulPushPerformer = new StatefulPushPerformer();
-    private final ConfigurationVerifier configurationVerifier = new ConfigurationVerifier();
+    private FilteringEnabledPredicate filteringEnabledPredicate;
+    private StatefulPushPerformer statefulPushPerformer;
+    private ConfigurationVerifier configurationVerifier;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        configurationVerifier.assertConfigValid(filterConfig);
+        LOGGER.debug("Instantiating dependencies for push filter");
+        configurationVerifier = new ConfigurationVerifier();
 
+        HttpServletHeaderExtractor httpServletHeaderExtractor = new HttpServletHeaderExtractor();
+        filteringEnabledPredicate = new FilteringEnabledPredicate(httpServletHeaderExtractor);
+
+        RelativeRefererPathExtractor relativeRefererPathExtractor = new RelativeRefererPathExtractor(httpServletHeaderExtractor);
+        Random random = new Random();
+        PushCacheEvictor pushCacheEvictor = new PushCacheEvictor(random);
+        ResourcePushService resourcePushService = new ResourcePushService();
+        PushCacheSecondaryResourceAppender pushCacheSecondaryResourceAppender = new PushCacheSecondaryResourceAppender();
+        SecondaryResourceAssosiatedWithPrimaryResourcePredicate secondaryResourceAssosiatedWithPrimaryResourcePredicate = new SecondaryResourceAssosiatedWithPrimaryResourcePredicate();
+
+        statefulPushPerformer = new StatefulPushPerformer(relativeRefererPathExtractor, pushCacheEvictor, resourcePushService,
+                pushCacheSecondaryResourceAppender, secondaryResourceAssosiatedWithPrimaryResourcePredicate);
+        configurationVerifier = new ConfigurationVerifier();
+
+        LOGGER.debug("Instatiated dependencies, verifying configuration");
+        configurationVerifier.assertConfigValid(filterConfig);
+        LOGGER.debug("Configuration verified");
     }
 
     @Override

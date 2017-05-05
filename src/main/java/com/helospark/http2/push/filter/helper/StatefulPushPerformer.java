@@ -18,12 +18,21 @@ public class StatefulPushPerformer {
     private final Map<String, LastUserResource> lastPrimaryResourcePerUser = new ConcurrentHashMap<>();
     private final Map<String, PrimaryResourceData> pushCacheMap = new ConcurrentHashMap<>();
 
-    private final HttpServletHeaderExtractor httpServletHeaderExtractor = new HttpServletHeaderExtractor();
-    private final RelativeRefererPathExtractor relativeRefererPathExtractor = new RelativeRefererPathExtractor(httpServletHeaderExtractor);
-    private final PushCacheEvictor pushCacheEvictor = new PushCacheEvictor();
-    private final ResourcePushService resourcePushService = new ResourcePushService();
-    private final PushCacheSecondaryResourceAppender pushCacheSecondaryResourceAppender = new PushCacheSecondaryResourceAppender();
-    private final SecondaryResourceAssosiatedWithPrimaryResourcePredicate secondaryResourceAssosiatedWithPrimaryResourcePredicate = new SecondaryResourceAssosiatedWithPrimaryResourcePredicate();
+    private final RelativeRefererPathExtractor relativeRefererPathExtractor;
+    private final PushCacheEvictor pushCacheEvictor;
+    private final ResourcePushService resourcePushService;
+    private final PushCacheSecondaryResourceAppender pushCacheSecondaryResourceAppender;
+    private final SecondaryResourceAssosiatedWithPrimaryResourcePredicate secondaryResourceAssosiatedWithPrimaryResourcePredicate;
+
+    public StatefulPushPerformer(RelativeRefererPathExtractor relativeRefererPathExtractor,
+            PushCacheEvictor pushCacheEvictor, ResourcePushService resourcePushService, PushCacheSecondaryResourceAppender pushCacheSecondaryResourceAppender,
+            SecondaryResourceAssosiatedWithPrimaryResourcePredicate secondaryResourceAssosiatedWithPrimaryResourcePredicate) {
+        this.relativeRefererPathExtractor = relativeRefererPathExtractor;
+        this.pushCacheEvictor = pushCacheEvictor;
+        this.resourcePushService = resourcePushService;
+        this.pushCacheSecondaryResourceAppender = pushCacheSecondaryResourceAppender;
+        this.secondaryResourceAssosiatedWithPrimaryResourcePredicate = secondaryResourceAssosiatedWithPrimaryResourcePredicate;
+    }
 
     public void filterInternal(HttpServletRequest httpServletRequest) {
         String requestUri = httpServletRequest.getRequestURI();

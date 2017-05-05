@@ -57,7 +57,11 @@ If your project has a `web.xml` you can add the following:
 
 You can configure it's behavious with several servlet init parameter
 
- - TBD
+| Init parameter name | default value | Notes |
+| --- | --- | --- |
+| failFastOnOldServlet | true | Whether to fail fast on old servlets. At this moment not many containers support Servlet 4.0 (ex. tomcat plugin), therefore it is useful on development machine to not fail(just show error) |
+| secondaryResourceEvictionChance | 0.05 | Chance to evict a secondary resource (1.0 = 100%). This is useful for dynamic content, as a learnt resource may no longer be needed for a particular primary resource. Randomly eviciting resources will make sure the only required resources are staying. |
+| secondaryResourceAssotiationTime | 4000 | Time after a primary resource load that a secondary resource is still assotiated. |
 
 ## Testing
 
