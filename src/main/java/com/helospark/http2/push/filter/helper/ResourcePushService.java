@@ -18,7 +18,7 @@ import com.helospark.http2.push.filter.helper.domain.PrimaryResourceData;
 
 public class ResourcePushService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourcePushService.class);
-    private final Map<String, Object> pushLogMap = new ConcurrentHashMap<String, Object>();
+    private final Map<String, Object> pushLockMap = new ConcurrentHashMap<String, Object>();
 
     public void pushSecondaryResources(HttpServletRequest httpServletRequest, PrimaryResourceData primaryResourceData, Map<String, PrimaryResourceData> pushCacheMap) {
         Stream<String> resourceStreamToPush = collectResourcesToPush(primaryResourceData, pushCacheMap);
@@ -42,7 +42,6 @@ public class ResourcePushService {
                     .distinct()
                     .forEach(path -> pushResource(pushBuilder, path));
         }
-        pushLogMap.remove(userAddress);
     }
 
     private Stream<String> getTransitiveResourceStream(Map<String, PrimaryResourceData> pushCacheMap, List<String> resourcesToPush) {
@@ -58,7 +57,7 @@ public class ResourcePushService {
 
     private Object getLockForIp(String userAddress) {
         Object newLock = new Object();
-        return Optional.ofNullable(pushLogMap.putIfAbsent(userAddress, newLock))
+        return Optional.ofNullable(pushLockMap.putIfAbsent(userAddress, newLock))
                 .orElse(newLock);
     }
 
